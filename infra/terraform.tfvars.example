@@ -1,0 +1,9 @@
+# Copie este arquivo para terraform.tfvars antes de rodar o terraform apply
+# O arquivo terraform.tfvars NÃO deve ser commitado (.gitignore já cobre)
+
+aws_region            = "us-east-1"
+function_name         = "oficina-mecanica-auth"
+db_connection_string  = "TROQUE_ESTA_CONNECTION_STRING"
+jwt_key               = "TROQUE_ESTA_CHAVE"
+jwt_issuer            = "oficina-atendimento"
+jwt_audience          = "oficina-atendimento-api"
