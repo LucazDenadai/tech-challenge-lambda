@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/OficinaMecanica.Auth.Lambda/OficinaMecanica.Auth.Lambda.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/OficinaMecanica.Auth.Lambda.Tests/OficinaMecanica.Auth.Lambda.Tests.csproj" />
+  </Folder>
+</Solution>
