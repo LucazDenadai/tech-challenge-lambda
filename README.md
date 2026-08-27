@@ -34,7 +34,44 @@ O resto do projeto usa .NET 10, mas a AWS Lambda ainda não tem runtime gerencia
 4. CPF válido, cliente existente mas inativo → **403**
 5. CPF válido, cliente ativo → **200** com `{ "token": "<jwt>" }`
 
-O JWT emitido usa a claim `role=Cliente` — distinta dos tokens de funcionário (`Admin`/`Atendente`/`Mecanico`) emitidos pelo Atendimento. A integração com uma rota protegida real (ex: acompanhamento de OS) é feita no CARD-30.
+O JWT emitido usa a claim `role=Cliente` — distinta dos tokens de funcionário (`Admin`/`Atendente`/`Mecanico`) emitidos pelo Atendimento. A integração com a rota protegida real (acompanhamento de OS) é feita em [CARD-30](https://github.com/LucazDenadai/tech-challenge-docs/blob/main/cards/05-fase3-aws/CARD-30-api-gateway-integracao.md), validada no Atendimento via `[Authorize(Roles="Cliente")]` ([ADR-013](https://github.com/LucazDenadai/tech-challenge-docs/blob/main/adr/ADR-013-autenticacao-authorize-aspnet-nao-api-gateway.md)).
+
+### Payload de entrada e saída
+
+**Requisição:**
+
+```
+POST /atendimento/auth/cpf
+Content-Type: application/json
+
+{ "cpf": "12345678901" }
+```
+
+**200 OK** — cliente encontrado e ativo:
+
+```json
+{ "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI..." }
+```
+
+Claims do token: `sub` (ID do cliente), `role` (`Cliente`), `iss`, `aud`, `exp` (60 min por padrão).
+
+**400 Bad Request** — CPF com formato inválido (não passa na validação de dígito verificador):
+
+```json
+{ "erro": "CPF inválido." }
+```
+
+**404 Not Found** — CPF válido, mas nenhum cliente cadastrado com esse documento:
+
+```json
+{ "erro": "Cliente não encontrado." }
+```
+
+**403 Forbidden** — CPF válido, cliente cadastrado, mas inativo:
+
+```json
+{ "erro": "Cliente inativo." }
+```
 
 ## Variáveis de ambiente (runtime da Lambda)
 
@@ -46,7 +83,7 @@ O JWT emitido usa a claim `role=Cliente` — distinta dos tokens de funcionário
 | `JWT_AUDIENCE` | Audience do JWT — deve bater com `Jwt:Audience` do Atendimento (default: `oficina-atendimento-api`) |
 | `JWT_EXPIRACAO_MINUTOS` | Expiração do token em minutos (default: `60`) |
 
-Todas via Secrets Manager/variável de ambiente da Lambda — nunca hardcoded (ver `infra/main.tf`).
+Todas injetadas como variável de ambiente da Lambda via Terraform (`infra/main.tf`), a partir de GitHub Secrets do pipeline — nunca hardcoded.
 
 ## Cold start
 
