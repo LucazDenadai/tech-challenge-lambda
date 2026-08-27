@@ -11,8 +11,8 @@ public class Function
     private readonly IClienteRepository _clienteRepository;
     private readonly JwtGenerator _jwtGenerator;
 
-    // Usado pelo runtime AWS — lê configuração de variáveis de ambiente (Secrets Manager
-    // injeta a connection string e a chave JWT como env vars, ver README).
+    // Usado pelo runtime AWS — lê configuração de variáveis de ambiente
+    // (connection string e chave JWT injetadas via Terraform, ver README).
     public Function() : this(
         new ClienteRepository(EnvVarObrigatoria("DB_CONNECTION_STRING")),
         new JwtGenerator(
