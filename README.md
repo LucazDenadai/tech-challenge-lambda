@@ -4,6 +4,15 @@ Function Serverless (.NET) de autenticação via CPF — recebe um CPF, valida, 
 
 Documentação arquitetural completa (ADRs, RFCs, diagramas) em [tech-challenge-docs](https://github.com/LucazDenadai/tech-challenge-docs).
 
+Diagramas relevantes para este repositório:
+
+| Diagrama | Conteúdo |
+|---|---|
+| [Sequência — Autenticação via CPF](https://github.com/LucazDenadai/tech-challenge-docs/blob/main/diagramas/diagrama-sequencia-autenticacao.md) | Fluxo completo: CPF → esta função → JWT → consumo de rota protegida |
+| [Componentes](https://github.com/LucazDenadai/tech-challenge-docs/blob/main/diagramas/diagrama-componentes.md) | Onde esta função se encaixa na arquitetura de nuvem |
+
+Ver também [ADR-013](https://github.com/LucazDenadai/tech-challenge-docs/blob/main/adr/ADR-013-autenticacao-authorize-aspnet-nao-api-gateway.md): a validação do JWT emitido aqui acontece no Atendimento (`[Authorize]`), não no API Gateway.
+
 ## Decisão: .NET 8, não .NET 10
 
 O resto do projeto usa .NET 10, mas a AWS Lambda ainda não tem runtime gerenciado `dotnet10` — a lista de runtimes suportados pelo provider Terraform da AWS vai até `dotnet8`. Este repositório usa `net8.0` (só aqui) por essa restrição da plataforma, não por escolha de padrão.
