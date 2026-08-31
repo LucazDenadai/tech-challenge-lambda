@@ -86,3 +86,27 @@ resource "aws_lambda_function" "auth" {
     }
   }
 }
+
+# Integração com o API Gateway ja provisionado em tech-challenge-infra-k8s — gerenciada
+# aqui (nao la) para nao criar dependencia circular entre os dois repositorios de infra,
+# mesmo padrao ja usado para a security group rule do RDS acima.
+resource "aws_apigatewayv2_integration" "auth_lambda" {
+  api_id                 = data.terraform_remote_state.infra_k8s.outputs.api_gateway_id
+  integration_type       = "AWS_PROXY"
+  integration_uri        = aws_lambda_function.auth.invoke_arn
+  payload_format_version = "2.0"
+}
+
+resource "aws_apigatewayv2_route" "auth_cpf" {
+  api_id    = data.terraform_remote_state.infra_k8s.outputs.api_gateway_id
+  route_key = "POST /atendimento/auth/cpf"
+  target    = "integrations/${aws_apigatewayv2_integration.auth_lambda.id}"
+}
+
+resource "aws_lambda_permission" "api_gateway_invoke" {
+  statement_id  = "AllowAPIGatewayInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.auth.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${data.terraform_remote_state.infra_k8s.outputs.api_gateway_execution_arn}/*/*/atendimento/auth/cpf"
+}
